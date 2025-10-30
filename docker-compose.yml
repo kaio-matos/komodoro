@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: "."
+      dockerfile: "./.docker/app/Dockerfile"
+    volumes:
+      - .:/app
+      - /etc/passwd:/etc/passwd
+    stdin_open: true
+    tty: true
+    ports:
+      - "${PORT}:${PORT}"
