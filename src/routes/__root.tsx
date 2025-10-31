@@ -48,29 +48,28 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
 			<head>
-				{/* TODO: Fix hydration warnings */}
-				{/* <script> */}
-				{/* 	{` */}
-				{/*                     window.addEventListener('DOMContentLoaded', () => { */}
-				{/*                         if (window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches) { */}
-				{/*                             document.body.classList.add('dark'); */}
-				{/*                         } */}
-				{/**/}
-				{/*                         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => { */}
-				{/*                             const newColorScheme = event.matches ? "dark" : "light"; */}
-				{/*                             if (newColorScheme === "dark") { */}
-				{/*                                 document.body.classList.add('dark'); */}
-				{/*                             } else { */}
-				{/*                                 document.body.classList.remove('dark'); */}
-				{/*                             } */}
-				{/*                         }); */}
-				{/*                     }) */}
-				{/*                 `} */}
-				{/* </script> */}
+				<script>
+					{`
+                        window.addEventListener('DOMContentLoaded', () => {
+                            if (window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches) {
+                                document.body.classList.add('dark');
+                            }
+
+                            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                                const newColorScheme = event.matches ? "dark" : "light";
+                                if (newColorScheme === "dark") {
+                                    document.body.classList.add('dark');
+                                } else {
+                                    document.body.classList.remove('dark');
+                                }
+                            });
+                        })
+                    `}
+				</script>
 
 				<HeadContent />
 			</head>
-			<body>
+			<body suppressHydrationWarning>
 				{children}
 				<TanStackDevtools
 					config={{
