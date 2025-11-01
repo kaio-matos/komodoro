@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { formatTime, toMiliseconds } from "@/lib/utils";
 import { Pause, Play, TimerResetIcon } from "lucide-react";
 import { useState, useEffect } from "react";
+import pressAudioURL from "@/assets/audio/autoradio_button_press.wav?url";
+import { useAudio } from "@/hooks/use-audio";
 
 export function Timer({
 	initialTime = toMiliseconds(25),
@@ -12,12 +14,15 @@ export function Timer({
 	const [intervalId, setIntervalId] = useState<
 		ReturnType<typeof setInterval> | undefined
 	>(undefined);
+	const pressAudio = useAudio(pressAudioURL);
 
 	const hasStarted = time < initialTime;
 	const isRunning = intervalId !== undefined;
 
 	function start() {
 		if (intervalId) return;
+
+		pressAudio.forcePlay();
 
 		setIntervalId(
 			setInterval(() => {
@@ -27,6 +32,7 @@ export function Timer({
 	}
 
 	function pause() {
+		pressAudio.forcePlay();
 		clearInterval(intervalId);
 		setIntervalId(undefined);
 	}
