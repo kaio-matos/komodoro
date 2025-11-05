@@ -21,14 +21,15 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useAudioContext } from "@/providers/audio";
 import { Spinner } from "@/components/ui/spinner";
+import type { TUsePomodoroSettingsReturn } from "../hooks/use-pomodoro-settings";
+import { Input } from "@/components/ui/input";
 
 export function PomodoroSettings({
-  alarmSound,
-  onAlarmSoundSelect,
-}: {
-  alarmSound: string;
-  onAlarmSoundSelect: (url: string) => void;
-}) {
+  alarm,
+  setAlarm,
+  repeat,
+  setRepeat,
+}: TUsePomodoroSettingsReturn) {
   const { gainNode } = useAudioContext();
 
   return (
@@ -48,6 +49,53 @@ export function PomodoroSettings({
           <DialogDescription>
             Change background sounds and the timings.
           </DialogDescription>
+
+          <div className="mt-4 flex gap-4">
+            <Label className="flex flex-col items-start gap-2 flex-1">
+              Alarm Sound
+              <Select
+                defaultValue={alarm}
+                onValueChange={(value) => {
+                  setAlarm(value);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Alarm Sound" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(alarmSounds).map((value) => {
+                    return (
+                      <SelectItem
+                        key={value.default}
+                        value={value.default}
+                        label={value.default
+                          .split("/")
+                          .pop()
+                          ?.replace(/\.[^/.]+$/, "")}
+                      >
+                        <PlaySoundButton
+                          soundUrl={value.default}
+                          className="ml-auto"
+                          onPointerUp={(e) => e.stopPropagation()}
+                        />
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </Label>
+
+            <Label className="flex flex-col items-start gap-2 flex-1">
+              Repeat alarm
+              <Input
+                type="number"
+                value={repeat}
+                onChange={(e) => setRepeat(Number(e.target.value))}
+                max={5}
+                min={1}
+              />
+            </Label>
+          </div>
 
           <Label className="mt-4 flex flex-col items-start gap-2">
             Volume
@@ -76,40 +124,6 @@ export function PomodoroSettings({
           {/*     step={0.01} */}
           {/*   /> */}
           {/* </Label> */}
-
-          <Label className="mt-4 flex flex-col items-start gap-2">
-            Alarm Sound
-            <Select
-              defaultValue={alarmSound}
-              onValueChange={(value) => {
-                onAlarmSoundSelect(value);
-              }}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Alarm Sound" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(alarmSounds).map((value) => {
-                  return (
-                    <SelectItem
-                      key={value.default}
-                      value={value.default}
-                      label={value.default
-                        .split("/")
-                        .pop()
-                        ?.replace(/\.[^/.]+$/, "")}
-                    >
-                      <PlaySoundButton
-                        soundUrl={value.default}
-                        className="ml-auto"
-                        onPointerUp={(e) => e.stopPropagation()}
-                      />
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </Label>
         </DialogHeader>
       </DialogContent>
     </Dialog>
@@ -128,7 +142,7 @@ const PlaySoundButton: React.FC<
       variant="secondary"
       {...props}
     >
-      {audioControl.play.isProcessing ? <Spinner /> : <Play />}
+      {audioControl.tryingToPlay.isProcessing ? <Spinner /> : <Play />}
     </Button>
   );
 };
