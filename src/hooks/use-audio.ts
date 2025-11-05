@@ -1,33 +1,50 @@
+import { useAudioContext } from "@/providers/audio";
 import { useEffect, useRef } from "react";
+import { useAsyncFunction } from "./use-async-state";
 
-// TODO: make it work with async import audio files
 export function useAudio(url: string) {
-	const audio = useRef<HTMLAudioElement | null>(null);
+  const { connectAudio, audioContext, audioElementsCache } = useAudioContext();
+  const audio = useRef<HTMLAudioElement>(audioElementsCache.current.get(url));
 
-	useEffect(() => {
-		audio.current = new Audio(url);
-	}, [url]);
+  const play = useAsyncFunction({
+    fn: async () => {
+      if (audioContext.current?.state === "suspended") {
+        audioContext.current.resume();
+      }
 
-	return {
-		audioRef: audio,
+      return audio.current?.play();
+    },
+  });
 
-		play() {
-			return audio.current?.play();
-		},
+  useEffect(() => {
+    audio.current = audioElementsCache.current.get(url);
+    if (!audio.current) {
+      audio.current = new Audio(url);
+      audioElementsCache.current.set(url, audio.current);
+      connectAudio(audio.current);
+    }
+  }, [url]);
 
-		pause() {
-			return audio.current?.play();
-		},
+  function pause() {
+    return audio.current?.pause();
+  }
 
-		reset() {
-			if (audio.current) {
-				audio.current.currentTime = 0;
-			}
-		},
+  function reset() {
+    if (audio.current) {
+      audio.current.currentTime = 0;
+    }
+  }
 
-		forcePlay() {
-			this.reset();
-			this.play();
-		},
-	};
+  function forcePlay() {
+    reset();
+    play.execute();
+  }
+  return {
+    audioRef: audio,
+
+    play,
+    pause,
+    reset,
+    forcePlay,
+  };
 }
