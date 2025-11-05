@@ -50,7 +50,7 @@ export function Timer({
 
   return (
     <div className="flex flex-col gap-6">
-      <h3 className="text-8xl font-bold">{formatTime(time)}</h3>
+      <h3 className="text-5xl sm:text-8xl font-bold">{formatTime(time)}</h3>
       <div className="flex gap-2 mt-3">
         <Button
           className="flex-1"

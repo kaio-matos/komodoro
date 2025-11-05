@@ -6,6 +6,7 @@ import { Timer } from "../timer";
 import { PomodoroSettings } from "../pomodoro-settings";
 import { alarmSounds } from "../sounds";
 import { useAudio } from "@/hooks/use-audio";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 enum PomodoroMode {
   Pomodoro = "pomodoro",
@@ -31,22 +32,18 @@ export function PomodoroPicker() {
       onValueChange={(v) => {
         onValueChange(v as PomodoroMode);
       }}
-      className="w-[450px] relative"
+      className="sm:w-[450px] relative"
     >
-      <Card className="px-5 ">
-        <CardHeader>
+      <Card className="px-5">
+        <div className="flex flex-col gap-2">
           <PomodoroSettings alarmSound={alarm} onAlarmSoundSelect={setAlarm} />
-          <div>
-            <TabsList className="mx-auto">
-              <TabsTrigger value={PomodoroMode.Pomodoro}>Pomodoro</TabsTrigger>
-              <TabsTrigger value={PomodoroMode.ShortBreak}>
-                Short Break
-              </TabsTrigger>
-              <TabsTrigger value={PomodoroMode.LongBreak}>
-                Long Break
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          <TabsList className="mx-auto w-full sm:w-auto">
+            <TabsTrigger value={PomodoroMode.Pomodoro}>Pomodoro</TabsTrigger>
+            <TabsTrigger value={PomodoroMode.ShortBreak}>
+              Short Break
+            </TabsTrigger>
+            <TabsTrigger value={PomodoroMode.LongBreak}>Long Break</TabsTrigger>
+          </TabsList>
           <CardTitle className="text-center mt-4 text-2xl">
             {
               {
@@ -56,7 +53,7 @@ export function PomodoroPicker() {
               }[value]
             }
           </CardTitle>
-        </CardHeader>
+        </div>
         <CardContent>
           <TabsContent value={PomodoroMode.Pomodoro}>
             <Timer initialTime={toMiliseconds(25)} onFinish={onFinish} />

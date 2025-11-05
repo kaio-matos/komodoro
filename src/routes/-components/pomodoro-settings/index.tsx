@@ -29,12 +29,16 @@ export function PomodoroSettings({
   alarmSound: string;
   onAlarmSoundSelect: (url: string) => void;
 }) {
-  const { gainNode, panner } = useAudioContext();
+  const { gainNode } = useAudioContext();
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="absolute top-4 right-4" variant="ghost" size="icon">
+        <Button
+          className="flex items-center justify-center  gap-1 sm:absolute sm:top-4 sm:right-4"
+          variant="ghost"
+        >
+          <span className="sm:sr-only">Settings</span>
           <Settings />
         </Button>
       </DialogTrigger>
