@@ -62,7 +62,7 @@ export function PomodoroPicker() {
             <Timer initialTime={toMiliseconds(25)} onFinish={onFinish} />
           </TabsContent>
           <TabsContent value={PomodoroMode.ShortBreak}>
-            <Timer initialTime={toMiliseconds(0.5)} onFinish={onFinish} />
+            <Timer initialTime={toMiliseconds(5)} onFinish={onFinish} />
           </TabsContent>
           <TabsContent value={PomodoroMode.LongBreak}>
             <Timer initialTime={toMiliseconds(15)} onFinish={onFinish} />
