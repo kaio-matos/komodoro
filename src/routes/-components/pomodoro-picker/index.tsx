@@ -1,6 +1,6 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toMiliseconds } from "@/lib/utils";
+import { toSeconds } from "@/lib/utils";
 import { useState } from "react";
 import { Timer } from "../timer";
 import { PomodoroSettings } from "../pomodoro-settings";
@@ -16,14 +16,30 @@ enum PomodoroMode {
 export function PomodoroPicker() {
   const [value, onValueChange] = useState<PomodoroMode>(PomodoroMode.Pomodoro);
   const pomodoroSettings = usePomodoroSettings();
-  const { forcePlay } = useAudio(pomodoroSettings.alarm);
+  const alarmAudioControl = useAudio(pomodoroSettings.alarm);
+  const backgroundAudioControl = useAudio(pomodoroSettings.background, {
+    volume: pomodoroSettings.backgroundVolume,
+  });
+
+  function onStart() {
+    backgroundAudioControl.forcePlay();
+  }
+
+  function onReset() {
+    backgroundAudioControl.stop();
+  }
+
+  function onStop() {
+    backgroundAudioControl.stop();
+  }
 
   function onFinish() {
+    backgroundAudioControl.stop();
     const play = async (repeat: number) => {
       if (repeat === 0) {
         return;
       }
-      await forcePlay();
+      await alarmAudioControl.forcePlay();
       play(repeat - 1);
     };
 
@@ -36,6 +52,7 @@ export function PomodoroPicker() {
       value={value}
       onValueChange={(v) => {
         onValueChange(v as PomodoroMode);
+        backgroundAudioControl.stop();
       }}
       className="sm:w-[450px] relative"
     >
@@ -62,20 +79,29 @@ export function PomodoroPicker() {
         <CardContent>
           <TabsContent value={PomodoroMode.Pomodoro}>
             <Timer
-              initialTime={toMiliseconds(import.meta.env.DEV ? 1 : 25)}
+              initialTime={toSeconds(import.meta.env.DEV ? 1 : 25)}
+              onStart={onStart}
+              onStop={onStop}
               onFinish={onFinish}
+              onReset={onReset}
             />
           </TabsContent>
           <TabsContent value={PomodoroMode.ShortBreak}>
             <Timer
-              initialTime={toMiliseconds(import.meta.env.DEV ? 0.5 : 5)}
+              initialTime={toSeconds(import.meta.env.DEV ? 0.5 : 5)}
+              onStart={onStart}
+              onStop={onStop}
               onFinish={onFinish}
+              onReset={onReset}
             />
           </TabsContent>
           <TabsContent value={PomodoroMode.LongBreak}>
             <Timer
-              initialTime={toMiliseconds(import.meta.env.DEV ? 0.7 : 15)}
+              initialTime={toSeconds(import.meta.env.DEV ? 0.7 : 15)}
+              onStart={onStart}
+              onStop={onStop}
               onFinish={onFinish}
+              onReset={onReset}
             />
           </TabsContent>
         </CardContent>

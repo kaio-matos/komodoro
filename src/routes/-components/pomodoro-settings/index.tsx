@@ -16,21 +16,16 @@ import {
 } from "@/components/ui/select";
 import { useAudio } from "@/hooks/use-audio";
 import { Settings, Play } from "lucide-react";
-import { alarmSounds } from "../sounds";
+import { alarmSounds, backgroundSounds } from "../sounds";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Spinner } from "@/components/ui/spinner";
 import type { TUsePomodoroSettingsReturn } from "../hooks/use-pomodoro-settings";
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
+import { toSeconds } from "@/lib/utils";
 
-export function PomodoroSettings({
-  alarm,
-  setAlarm,
-  repeat,
-  setRepeat,
-  globalVolume,
-  setGlobalVolume,
-}: TUsePomodoroSettingsReturn) {
+export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -49,13 +44,74 @@ export function PomodoroSettings({
             Change background sounds and the timings.
           </DialogDescription>
 
+          <Label className="mt-4 flex flex-col items-start gap-2">
+            Global Volume
+            <Slider
+              defaultValue={[props.globalVolume]}
+              max={1.3}
+              min={0}
+              step={0.01}
+              onValueChange={(value) => {
+                props.setGlobalVolume(value[0]);
+              }}
+            />
+          </Label>
+
+          <Label className="mt-4 flex flex-col items-start gap-2">
+            Background Volume
+            <Slider
+              defaultValue={[props.backgroundVolume]}
+              max={1}
+              min={0}
+              step={0.01}
+              onValueChange={(value) => {
+                props.setBackgrondVolume(value[0]);
+              }}
+            />
+          </Label>
+
+          <Label className="mt-4 flex flex-col items-start gap-2 flex-1">
+            Background Noise
+            <Select
+              defaultValue={props.background}
+              onValueChange={(value) => {
+                props.setBackground(value);
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Background noise" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(backgroundSounds).map(([key, value]) => {
+                  return (
+                    <SelectItem
+                      key={value.default}
+                      value={value.default}
+                      label={key
+                        .split("/")
+                        .pop()
+                        ?.replace(/\.[^/.]+$/, "")}
+                    >
+                      <PlaySoundButton
+                        soundUrl={value.default}
+                        audioVolume={props.backgroundVolume}
+                        className="ml-auto"
+                        onPointerUp={(e) => e.stopPropagation()}
+                      />
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </Label>
+
           <div className="mt-4 flex gap-4">
             <Label className="flex flex-col items-start gap-2 flex-1">
               Alarm Sound
               <Select
-                defaultValue={alarm}
+                defaultValue={props.alarm}
                 onValueChange={(value) => {
-                  setAlarm(value);
+                  props.setAlarm(value);
                 }}
               >
                 <SelectTrigger className="w-full">
@@ -88,30 +144,17 @@ export function PomodoroSettings({
               Repeat alarm
               <Input
                 type="number"
-                value={repeat}
+                value={props.repeat}
                 onChange={(e) => {
                   const n = Number(e.target.value);
                   if (n < Number(e.target.min)) return;
-                  setRepeat(n);
+                  props.setRepeat(n);
                 }}
                 max={5}
                 min={1}
               />
             </Label>
           </div>
-
-          <Label className="mt-4 flex flex-col items-start gap-2">
-            Volume
-            <Slider
-              defaultValue={[globalVolume]}
-              max={1.3}
-              min={0}
-              step={0.01}
-              onValueChange={(value) => {
-                setGlobalVolume(value[0]);
-              }}
-            />
-          </Label>
 
           {/* <Label className="mt-4 flex flex-col items-start gap-2"> */}
           {/*   Side */}
@@ -133,9 +176,30 @@ export function PomodoroSettings({
 }
 
 const PlaySoundButton: React.FC<
-  React.ComponentProps<typeof Button> & { soundUrl: string }
-> = ({ soundUrl, ...props }) => {
-  const audioControl = useAudio(soundUrl);
+  React.ComponentProps<typeof Button> & {
+    soundUrl: string;
+    previewLength?: number;
+    audioVolume?: number;
+  }
+> = ({
+  soundUrl,
+  audioVolume = 1,
+  previewLength = toSeconds(0.1),
+  ...props
+}) => {
+  const audioControl = useAudio(soundUrl, {
+    volume: audioVolume,
+    onStart() {
+      setTimeout(() => {
+        audioControl.stop();
+      }, previewLength * 1000);
+    },
+  });
+
+  useEffect(() => {
+    audioControl.setVolume(audioVolume);
+  }, [audioVolume]);
+
   return (
     <Button
       onClick={() => {
@@ -145,6 +209,9 @@ const PlaySoundButton: React.FC<
       {...props}
     >
       {audioControl.tryingToPlay.isProcessing ? <Spinner /> : <Play />}
+      <span className="sr-only">
+        {audioControl.tryingToPlay.isProcessing ? "Loading" : "Preview"}
+      </span>
     </Button>
   );
 };
