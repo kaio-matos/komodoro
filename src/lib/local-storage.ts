@@ -1,5 +1,5 @@
 export const LocalStorage = (() => {
-  function getItem<T>(key: string, fallback: T): T {
+  function getItem<T extends object>(key: string, fallback: T): T {
     try {
       const value = localStorage.getItem(key);
       if (!value) return fallback;

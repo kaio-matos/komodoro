@@ -17,7 +17,7 @@ export function usePomodoroSettings() {
     [],
   );
 
-  const [alarm, setAlarm] = useState<string>(saved.alarm);
+  const [alarm, setAlarm] = useState(saved.alarm);
   const [repeat, setRepeat] = useState(saved.repeat);
   const [globalVolume, setGlobalVolume] = useState(saved.globalVolume);
 
@@ -31,7 +31,6 @@ export function usePomodoroSettings() {
 
   useEffect(() => {
     if (!gainNode.current) return;
-    console.log(globalVolume);
     gainNode.current.gain.value = globalVolume;
   }, [globalVolume]);
 
