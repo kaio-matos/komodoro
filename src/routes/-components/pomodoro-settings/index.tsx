@@ -62,12 +62,12 @@ export function PomodoroSettings({
                   <SelectValue placeholder="Alarm Sound" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(alarmSounds).map((value) => {
+                  {Object.entries(alarmSounds).map(([key, value]) => {
                     return (
                       <SelectItem
                         key={value.default}
                         value={value.default}
-                        label={value.default
+                        label={key
                           .split("/")
                           .pop()
                           ?.replace(/\.[^/.]+$/, "")}
