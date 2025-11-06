@@ -89,7 +89,11 @@ export function PomodoroSettings({
               <Input
                 type="number"
                 value={repeat}
-                onChange={(e) => setRepeat(Number(e.target.value))}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  if (n < Number(e.target.min)) return;
+                  setRepeat(n);
+                }}
                 max={5}
                 min={1}
               />

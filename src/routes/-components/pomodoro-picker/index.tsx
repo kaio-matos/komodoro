@@ -27,7 +27,7 @@ export function PomodoroPicker() {
       play(repeat - 1);
     };
 
-    play(pomodoroSettings.repeat + 1);
+    play(pomodoroSettings.repeat);
   }
 
   return (
