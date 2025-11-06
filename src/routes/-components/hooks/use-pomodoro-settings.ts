@@ -3,16 +3,16 @@ import { alarmSounds, backgroundSounds } from "../sounds";
 import { LocalStorage } from "@/lib/local-storage";
 import { useAudioContext } from "@/providers/audio";
 
-const alarms = Object.values(alarmSounds);
-const backgrounds = Object.values(backgroundSounds);
+const alarms = Object.keys(alarmSounds);
+const backgrounds = Object.keys(backgroundSounds);
 
 export function usePomodoroSettings() {
   const { gainNode } = useAudioContext();
   const saved = useMemo(
     () =>
       LocalStorage.getItem("pomodoro-settings", {
-        alarm: alarms[0].default,
-        background: backgrounds[0].default,
+        alarm: alarms[0],
+        background: backgrounds[0],
         repeat: 2,
         globalVolume: gainNode.current?.gain.value ?? 0,
         backgroundVolume: 0.1,

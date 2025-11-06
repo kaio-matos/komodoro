@@ -6,6 +6,7 @@ import { Timer } from "../timer";
 import { PomodoroSettings } from "../pomodoro-settings";
 import { useAudio } from "@/hooks/use-audio";
 import { usePomodoroSettings } from "../hooks/use-pomodoro-settings";
+import { alarmSounds, backgroundSounds } from "../sounds";
 
 enum PomodoroMode {
   Pomodoro = "pomodoro",
@@ -16,10 +17,15 @@ enum PomodoroMode {
 export function PomodoroPicker() {
   const [value, onValueChange] = useState<PomodoroMode>(PomodoroMode.Pomodoro);
   const pomodoroSettings = usePomodoroSettings();
-  const alarmAudioControl = useAudio(pomodoroSettings.alarm);
-  const backgroundAudioControl = useAudio(pomodoroSettings.background, {
-    volume: pomodoroSettings.backgroundVolume,
-  });
+  const alarmAudioControl = useAudio(
+    alarmSounds[pomodoroSettings.alarm].default,
+  );
+  const backgroundAudioControl = useAudio(
+    backgroundSounds[pomodoroSettings.background].default,
+    {
+      volume: pomodoroSettings.backgroundVolume,
+    },
+  );
 
   function onStart() {
     backgroundAudioControl.forcePlay();

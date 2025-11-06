@@ -86,7 +86,7 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
                   return (
                     <SelectItem
                       key={value.default}
-                      value={value.default}
+                      value={key}
                       label={key
                         .split("/")
                         .pop()
@@ -122,7 +122,7 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
                     return (
                       <SelectItem
                         key={value.default}
-                        value={value.default}
+                        value={key}
                         label={key
                           .split("/")
                           .pop()
