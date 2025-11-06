@@ -3,7 +3,7 @@ export const LocalStorage = (() => {
     try {
       const value = localStorage.getItem(key);
       if (!value) return fallback;
-      return JSON.parse(value) as T;
+      return { ...fallback, ...JSON.parse(value) } as T;
     } catch {
       return fallback;
     }

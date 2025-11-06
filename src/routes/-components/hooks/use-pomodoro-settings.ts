@@ -1,28 +1,41 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { alarmSounds } from "../sounds";
 import { LocalStorage } from "@/lib/local-storage";
+import { useAudioContext } from "@/providers/audio";
 
 const alarms = Object.values(alarmSounds);
 
 export function usePomodoroSettings() {
-  const saved = useRef(
-    LocalStorage.getItem("pomodoro-settings", {
-      alarm: alarms[0].default,
-      repeat: 2,
-    }),
+  const { gainNode } = useAudioContext();
+  const saved = useMemo(
+    () =>
+      LocalStorage.getItem("pomodoro-settings", {
+        alarm: alarms[0].default,
+        repeat: 2,
+        globalVolume: gainNode.current?.gain.value ?? 0,
+      }),
+    [],
   );
 
-  const [alarm, setAlarm] = useState<string>(saved.current.alarm);
-  const [repeat, setRepeat] = useState(2);
+  const [alarm, setAlarm] = useState<string>(saved.alarm);
+  const [repeat, setRepeat] = useState(saved.repeat);
+  const [globalVolume, setGlobalVolume] = useState(saved.globalVolume);
 
   useEffect(() => {
     LocalStorage.setItem("pomodoro-settings", {
       alarm,
       repeat,
+      globalVolume,
     });
-  }, [alarm, repeat]);
+  }, [alarm, repeat, globalVolume]);
 
-  return { alarm, setAlarm, repeat, setRepeat };
+  useEffect(() => {
+    if (!gainNode.current) return;
+    console.log(globalVolume);
+    gainNode.current.gain.value = globalVolume;
+  }, [globalVolume]);
+
+  return { alarm, setAlarm, repeat, setRepeat, globalVolume, setGlobalVolume };
 }
 
 export type TUsePomodoroSettingsReturn = ReturnType<typeof usePomodoroSettings>;

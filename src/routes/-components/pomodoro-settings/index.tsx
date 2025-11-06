@@ -19,7 +19,6 @@ import { Settings, Play } from "lucide-react";
 import { alarmSounds } from "../sounds";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { useAudioContext } from "@/providers/audio";
 import { Spinner } from "@/components/ui/spinner";
 import type { TUsePomodoroSettingsReturn } from "../hooks/use-pomodoro-settings";
 import { Input } from "@/components/ui/input";
@@ -29,9 +28,9 @@ export function PomodoroSettings({
   setAlarm,
   repeat,
   setRepeat,
+  globalVolume,
+  setGlobalVolume,
 }: TUsePomodoroSettingsReturn) {
-  const { gainNode } = useAudioContext();
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -100,13 +99,12 @@ export function PomodoroSettings({
           <Label className="mt-4 flex flex-col items-start gap-2">
             Volume
             <Slider
-              defaultValue={[gainNode.current?.gain.value ?? 0]}
+              defaultValue={[globalVolume]}
               max={1.3}
               min={0}
               step={0.01}
               onValueChange={(value) => {
-                if (!gainNode.current) return;
-                gainNode.current.gain.value = value[0];
+                setGlobalVolume(value[0]);
               }}
             />
           </Label>
