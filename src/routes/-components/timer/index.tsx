@@ -7,89 +7,89 @@ import { useAudio } from "@/hooks/use-audio";
 import { usePreciseInterval } from "@/hooks/use-precise-interval";
 
 export function Timer({
-  initialTime = toSeconds(25),
-  onStart,
-  onFinish,
-  onStop,
-  onReset,
+	initialTime = toSeconds(25),
+	onStart,
+	onFinish,
+	onStop,
+	onReset,
 }: {
-  initialTime?: number;
-  onStart?: () => void;
-  onStop?: () => void;
-  onFinish?: () => void;
-  onReset?: () => void;
+	initialTime?: number;
+	onStart?: () => void;
+	onStop?: () => void;
+	onFinish?: () => void;
+	onReset?: () => void;
 }) {
-  const [time, setTime] = useState(initialTime);
-  const pressAudio = useAudio(pressAudioURL);
-  const timer = usePreciseInterval({
-    callback() {
-      setTime((time) => (time > 0 ? time - 1 : 0));
-    },
-    delay: 1000,
-  });
+	const [time, setTime] = useState(initialTime);
+	const pressAudio = useAudio(pressAudioURL);
+	const timer = usePreciseInterval({
+		callback() {
+			setTime((time) => (time > 0 ? time - 1 : 0));
+		},
+		delay: 1000,
+	});
 
-  const hasStarted = time < initialTime;
-  const hasFinished = time === 0;
-  const isRunning = timer.isRunning;
+	const hasStarted = time < initialTime;
+	const hasFinished = time === 0;
+	const isRunning = timer.isRunning;
 
-  useEffect(() => {
-    if (hasFinished) {
-      onFinish?.();
-      timer.stop();
-    }
-  }, [hasFinished]);
+	useEffect(() => {
+		if (hasFinished) {
+			onFinish?.();
+			timer.stop();
+		}
+	}, [hasFinished]);
 
-  function start() {
-    timer.start();
-    pressAudio.forcePlay();
-    onStart?.();
-  }
+	function start() {
+		timer.start();
+		pressAudio.forcePlay();
+		onStart?.();
+	}
 
-  function pause() {
-    pressAudio.forcePlay();
-    timer.stop();
-    onStop?.();
-  }
+	function pause() {
+		pressAudio.forcePlay();
+		timer.stop();
+		onStop?.();
+	}
 
-  function reset() {
-    pressAudio.forcePlay();
-    timer.stop();
-    setTime(initialTime);
-    onReset?.();
-  }
+	function reset() {
+		pressAudio.forcePlay();
+		timer.stop();
+		setTime(initialTime);
+		onReset?.();
+	}
 
-  return (
-    <div className="flex flex-col gap-6">
-      <h3 className="text-5xl sm:text-8xl font-bold">{formatTime(time)}</h3>
-      <div className="flex gap-2 mt-3">
-        <Button
-          className="flex-1"
-          size="lg"
-          onClick={() => start()}
-          disabled={isRunning || hasFinished}
-        >
-          <Play />
-          <span className="sr-only">Play</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="lg"
-          onClick={() => reset()}
-          disabled={!hasStarted}
-        >
-          <TimerResetIcon />
-          <span className="sr-only">Reset</span>
-        </Button>
-        <Button
-          className="flex-1"
-          size="lg"
-          onClick={() => pause()}
-          disabled={!isRunning}
-        >
-          <Pause />
-          <span className="sr-only">Pause</span>
-        </Button>
-      </div>
-    </div>
-  );
+	return (
+		<div className="flex flex-col gap-6">
+			<h3 className="text-5xl sm:text-8xl font-bold">{formatTime(time)}</h3>
+			<div className="flex gap-2 mt-3">
+				<Button
+					className="flex-1"
+					size="lg"
+					onClick={() => start()}
+					disabled={isRunning || hasFinished}
+				>
+					<Play />
+					<span className="sr-only">Play</span>
+				</Button>
+				<Button
+					variant="ghost"
+					size="lg"
+					onClick={() => reset()}
+					disabled={!hasStarted}
+				>
+					<TimerResetIcon />
+					<span className="sr-only">Reset</span>
+				</Button>
+				<Button
+					className="flex-1"
+					size="lg"
+					onClick={() => pause()}
+					disabled={!isRunning}
+				>
+					<Pause />
+					<span className="sr-only">Pause</span>
+				</Button>
+			</div>
+		</div>
+	);
 }

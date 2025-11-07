@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useWorker } from "./use-web-worker";
 
 export function usePreciseInterval({
-  callback,
-  delay,
+	callback,
+	delay,
 }: {
-  callback: () => void;
-  delay?: number;
+	callback: () => void;
+	delay?: number;
 }) {
-  const { worker } = useWorker(
-    `
+	const { worker } = useWorker(
+		`
         let interval;
         self.onmessage = (e) => {
             switch (e.data.message) {
@@ -24,33 +24,33 @@ export function usePreciseInterval({
             }
         }
     `,
-    { isScript: true },
-  );
-  const [isRunning, setIsRunning] = useState(false);
+		{ isScript: true },
+	);
+	const [isRunning, setIsRunning] = useState(false);
 
-  function start() {
-    worker.current?.postMessage({ message: "start", delay });
-    setIsRunning(true);
-  }
+	function start() {
+		worker.current?.postMessage({ message: "start", delay });
+		setIsRunning(true);
+	}
 
-  function stop() {
-    worker.current?.postMessage({ message: "stop" });
-    setIsRunning(false);
-  }
+	function stop() {
+		worker.current?.postMessage({ message: "stop" });
+		setIsRunning(false);
+	}
 
-  useEffect(() => {
-    const fn = (e: WorkerEventMap["message"]) => {
-      if (e.data.message === "tick") {
-        callback();
-      }
-    };
-    worker.current?.addEventListener("message", fn);
-    return () => worker.current?.removeEventListener("message", fn);
-  }, [worker.current, callback]);
+	useEffect(() => {
+		const fn = (e: WorkerEventMap["message"]) => {
+			if (e.data.message === "tick") {
+				callback();
+			}
+		};
+		worker.current?.addEventListener("message", fn);
+		return () => worker.current?.removeEventListener("message", fn);
+	}, [worker.current, callback]);
 
-  return {
-    start,
-    stop,
-    isRunning,
-  };
+	return {
+		start,
+		stop,
+		isRunning,
+	};
 }

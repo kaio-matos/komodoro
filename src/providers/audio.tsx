@@ -3,40 +3,40 @@ import { Cache } from "@/lib/cache";
 import { createContext, useContext, useEffect, useRef } from "react";
 
 const AudioContext = createContext<ReturnType<typeof useAudioContext__> | null>(
-  null,
+	null,
 );
 
 function useAudioContext__() {
-  const cache = useRef(
-    new Cache<string, AudioController>(1000 * 60 * 60), // 1 hour
-  );
+	const cache = useRef(
+		new Cache<string, AudioController>(1000 * 60 * 60), // 1 hour
+	);
 
-  useEffect(() => {
-    // TODO: Findout what to do if the audio is staled
-    // const interval = setInterval(() => {
-    //   cache.current.clearExpired();
-    // }, 10_000);
-    // return () => clearInterval(interval);
-  }, []);
+	useEffect(() => {
+		// TODO: Findout what to do if the audio is staled
+		// const interval = setInterval(() => {
+		//   cache.current.clearExpired();
+		// }, 10_000);
+		// return () => clearInterval(interval);
+	}, []);
 
-  return {
-    cache,
-  };
+	return {
+		cache,
+	};
 }
 
 export const AudioProvider: React.FC<React.PropsWithChildren> = (props) => {
-  return (
-    <AudioContext.Provider
-      value={useAudioContext__()}
-      {...props}
-    ></AudioContext.Provider>
-  );
+	return (
+		<AudioContext.Provider
+			value={useAudioContext__()}
+			{...props}
+		></AudioContext.Provider>
+	);
 };
 
 export function useAudioContext() {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error("useAudio must be used within an AudioProvider");
-  }
-  return context;
+	const context = useContext(AudioContext);
+	if (!context) {
+		throw new Error("useAudio must be used within an AudioProvider");
+	}
+	return context;
 }
