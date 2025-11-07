@@ -73,7 +73,7 @@ export function PomodoroPicker() {
   return (
     <>
       <ClientOnly fallback={null}>
-        <div className="absolute right-5 top-5 flex gap-2">
+        <div className="absolute top-5 right-1/2 transform translate-x-1/2 flex gap-2">
           <MuteButton {...pomodoroSettings.globalVolume}>All</MuteButton>
           <MuteButton {...backgroundAudioControl.volumeControl}>
             Background
