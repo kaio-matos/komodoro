@@ -27,9 +27,13 @@ export function PomodoroPicker() {
     },
   );
   const hasFinished = useRef(false);
+  const hasRestarted = useRef(false);
 
   async function onStart() {
+    hasRestarted.current = true;
+    hasFinished.current = false;
     backgroundAudioControl.stop();
+    alarmAudioControl.stop();
     const play = async () => {
       if (hasFinished.current) {
         return;
@@ -50,10 +54,11 @@ export function PomodoroPicker() {
   }
 
   function onFinish() {
+    hasFinished.current = false;
     hasFinished.current = true;
     backgroundAudioControl.stop();
     const play = async (repeat: number) => {
-      if (repeat === 0) {
+      if (repeat === 0 || hasRestarted.current === true) {
         return;
       }
       await alarmAudioControl.forcePlay();
