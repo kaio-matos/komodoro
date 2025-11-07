@@ -54,7 +54,7 @@ export function PomodoroPicker() {
   }
 
   function onFinish() {
-    hasFinished.current = false;
+    hasRestarted.current = false;
     hasFinished.current = true;
     backgroundAudioControl.stop();
     const play = async (repeat: number) => {
