@@ -12,10 +12,11 @@ function useAudioContext__() {
   );
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      cache.current.clearExpired();
-    }, 10_000);
-    return () => clearInterval(interval);
+    // TODO: Findout what to do if the audio is staled
+    // const interval = setInterval(() => {
+    //   cache.current.clearExpired();
+    // }, 10_000);
+    // return () => clearInterval(interval);
   }, []);
 
   return {
