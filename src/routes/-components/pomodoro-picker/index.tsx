@@ -19,6 +19,7 @@ export function PomodoroPicker() {
   const pomodoroSettings = usePomodoroSettings();
   const alarmAudioControl = useAudio(
     alarmSounds[pomodoroSettings.alarm].default,
+    { volume: pomodoroSettings.alarmVolume },
   );
   const backgroundAudioControl = useAudio(
     backgroundSounds[pomodoroSettings.background].default,

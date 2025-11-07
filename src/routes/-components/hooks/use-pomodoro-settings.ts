@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { alarmSounds, backgroundSounds } from "../sounds";
 import { LocalStorage } from "@/lib/local-storage";
 import { useAudioContext } from "@/providers/audio";
@@ -16,6 +16,7 @@ export function usePomodoroSettings() {
         repeat: 2,
         globalVolume: 1,
         backgroundVolume: 0.1,
+        alarmVolume: 1,
       }),
     [],
   );
@@ -27,6 +28,7 @@ export function usePomodoroSettings() {
   const [backgroundVolume, setBackgrondVolume] = useState(
     saved.backgroundVolume,
   );
+  const [alarmVolume, setAlarmVolume] = useState(saved.alarmVolume);
 
   function syncVolume() {
     cache.current.map.forEach((context) => {
@@ -43,8 +45,9 @@ export function usePomodoroSettings() {
       repeat,
       globalVolume,
       backgroundVolume,
+      alarmVolume,
     });
-  }, [alarm, background, repeat, globalVolume, backgroundVolume]);
+  }, [alarm, background, repeat, globalVolume, backgroundVolume, alarmVolume]);
 
   useEffect(() => {
     syncVolume();
@@ -61,6 +64,8 @@ export function usePomodoroSettings() {
     setGlobalVolume,
     backgroundVolume,
     setBackgrondVolume,
+    alarmVolume,
+    setAlarmVolume,
   };
 }
 
