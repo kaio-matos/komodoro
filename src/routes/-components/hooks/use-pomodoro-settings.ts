@@ -7,14 +7,14 @@ const alarms = Object.keys(alarmSounds);
 const backgrounds = Object.keys(backgroundSounds);
 
 export function usePomodoroSettings() {
-  const { gainNode } = useAudioContext();
+  const { cache } = useAudioContext();
   const saved = useMemo(
     () =>
       LocalStorage.getItem("pomodoro-settings", {
         alarm: alarms[0],
         background: backgrounds[0],
         repeat: 2,
-        globalVolume: gainNode.current?.gain.value ?? 0,
+        globalVolume: 1,
         backgroundVolume: 0.1,
       }),
     [],
@@ -28,6 +28,18 @@ export function usePomodoroSettings() {
     saved.backgroundVolume,
   );
 
+  function syncVolume() {
+    cache.current.map.forEach((context) => {
+      context.cached.setGlobalGain(globalVolume);
+      console.log({
+        gain: context.cached.getGain(),
+        globalGain: context.cached.getGlobalGain(),
+      });
+    });
+  }
+
+  syncVolume();
+
   useEffect(() => {
     LocalStorage.setItem("pomodoro-settings", {
       alarm,
@@ -39,8 +51,7 @@ export function usePomodoroSettings() {
   }, [alarm, background, repeat, globalVolume, backgroundVolume]);
 
   useEffect(() => {
-    if (!gainNode.current) return;
-    gainNode.current.gain.value = globalVolume;
+    syncVolume();
   }, [globalVolume]);
 
   return {

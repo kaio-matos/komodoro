@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAudioContext } from "@/providers/audio";
 import { useAsyncFunction } from "./use-async-state";
+import { AudioController, createAudioController } from "@/lib/audio-controller";
 
 const noop = () => {};
 
@@ -10,28 +11,29 @@ export function useAudio(
     volume = 1,
     onEnd = noop,
     onStart = noop,
-  }: { volume?: number; onStart?: () => void; onEnd?: () => void } = {},
+  }: {
+    volume?: number;
+    onStart?: () => void;
+    onEnd?: () => void;
+  } = {},
 ) {
-  const { connectAudio, audioContext, audioElementsCache } = useAudioContext();
-  const audio = useRef<HTMLAudioElement>(audioElementsCache.current.get(url));
+  const { cache } = useAudioContext();
+  const audio = useRef<AudioController>(cache.current.get(url));
 
   useEffect(() => {
-    audio.current = audioElementsCache.current.get(url);
+    audio.current = cache.current.get(url);
     if (!audio.current) {
-      audio.current = new Audio(url);
-
-      audioElementsCache.current.set(url, audio.current);
+      audio.current = createAudioController(new Audio(url));
+      cache.current.set(url, audio.current);
       setVolume(volume);
-      connectAudio(audio.current);
     }
   }, [url]);
 
   const tryingToPlay = useAsyncFunction({
     fn: async () => {
-      if (audioContext.current?.state === "suspended") {
-        audioContext.current.resume();
+      if (audio.current?.ctx?.state === "suspended") {
+        audio.current?.ctx.resume();
       }
-
       return audio.current?.play();
     },
   });
@@ -44,31 +46,30 @@ export function useAudio(
         const listener = () => {
           res();
           onEnd();
-          audio.current?.removeEventListener("ended", listener);
+          audio.current?.track.mediaElement.removeEventListener(
+            "ended",
+            listener,
+          );
         };
-        audio.current?.addEventListener("ended", listener);
+        audio.current?.track.mediaElement.addEventListener("ended", listener);
       });
     },
   });
 
   function pause() {
-    return audio.current?.pause();
+    audio.current?.pause();
   }
 
   function reset() {
-    if (audio.current) {
-      audio.current.currentTime = 0;
-    }
+    audio.current?.reset();
   }
 
   function stop() {
-    pause();
-    reset();
+    audio.current?.stop();
   }
 
   function setVolume(volume: number) {
-    if (!audio.current) return;
-    audio.current.volume = volume;
+    audio.current?.setGain(volume);
   }
 
   async function forcePlay() {
