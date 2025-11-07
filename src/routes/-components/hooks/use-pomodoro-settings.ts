@@ -31,10 +31,6 @@ export function usePomodoroSettings() {
   function syncVolume() {
     cache.current.map.forEach((context) => {
       context.cached.setGlobalGain(globalVolume);
-      console.log({
-        gain: context.cached.getGain(),
-        globalGain: context.cached.getGlobalGain(),
-      });
     });
   }
 

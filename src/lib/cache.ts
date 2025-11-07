@@ -43,7 +43,6 @@ export class Cache<K, T> {
     this.map.forEach(({ expiresAt }, key) => {
       if (!expiresAt) return;
       if (Date.now() > expiresAt.getTime()) {
-        console.log("clear");
         this.map.delete(key);
       }
     });
