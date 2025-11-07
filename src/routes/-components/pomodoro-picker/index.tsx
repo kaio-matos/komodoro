@@ -1,7 +1,7 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toSeconds } from "@/lib/utils";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Timer } from "../timer";
 import { PomodoroSettings } from "../pomodoro-settings";
 import { useAudio } from "@/hooks/use-audio";
@@ -26,9 +26,19 @@ export function PomodoroPicker() {
       volume: pomodoroSettings.backgroundVolume,
     },
   );
+  const hasFinished = useRef(false);
 
-  function onStart() {
-    backgroundAudioControl.forcePlay();
+  async function onStart() {
+    backgroundAudioControl.stop();
+    const play = async () => {
+      if (hasFinished.current) {
+        return;
+      }
+      await backgroundAudioControl.forcePlay();
+      play();
+    };
+
+    play();
   }
 
   function onReset() {
@@ -40,6 +50,7 @@ export function PomodoroPicker() {
   }
 
   function onFinish() {
+    hasFinished.current = true;
     backgroundAudioControl.stop();
     const play = async (repeat: number) => {
       if (repeat === 0) {
