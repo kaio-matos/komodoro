@@ -22,8 +22,8 @@ import { Slider } from "@/components/ui/slider";
 import { Spinner } from "@/components/ui/spinner";
 import type { TUsePomodoroSettingsReturn } from "../hooks/use-pomodoro-settings";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
 import { cn, toSeconds } from "@/lib/utils";
+import { TUseVolumeReturn } from "@/hooks/use-volume";
 
 export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
   return (
@@ -47,12 +47,12 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
           <Label className="mt-4 flex flex-col items-start gap-2">
             Global Volume
             <Slider
-              defaultValue={[props.globalVolume]}
+              defaultValue={[props.globalVolume.value]}
               max={1.3}
               min={0}
               step={0.01}
               onValueChange={(value) => {
-                props.setGlobalVolume(value[0]);
+                props.globalVolume.set(value[0]);
               }}
             />
           </Label>
@@ -62,12 +62,12 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
             <Label className="flex flex-col items-start gap-2">
               Background Volume
               <Slider
-                defaultValue={[props.backgroundVolume]}
+                defaultValue={[props.backgroundVolume.value]}
                 max={1}
                 min={0}
                 step={0.01}
                 onValueChange={(value) => {
-                  props.setBackgrondVolume(value[0]);
+                  props.backgroundVolume.set(value[0]);
                 }}
               />
             </Label>
@@ -97,7 +97,7 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
                       >
                         <PlaySoundButton
                           soundUrl={value.default}
-                          audioVolume={props.backgroundVolume}
+                          volumeControl={props.backgroundVolume}
                           className="ml-auto"
                           onPointerUp={(e) => e.stopPropagation()}
                         />
@@ -115,12 +115,12 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
             <Label className="flex flex-col items-start gap-2">
               Alarm Volume
               <Slider
-                defaultValue={[props.alarmVolume]}
+                defaultValue={[props.alarmVolume.value]}
                 max={1}
                 min={0}
                 step={0.01}
                 onValueChange={(value) => {
-                  props.setAlarmVolume(value[0]);
+                  props.alarmVolume.set(value[0]);
                 }}
               />
             </Label>
@@ -151,7 +151,7 @@ export function PomodoroSettings(props: TUsePomodoroSettingsReturn) {
                         >
                           <PlaySoundButton
                             soundUrl={value.default}
-                            audioVolume={props.alarmVolume}
+                            volumeControl={props.alarmVolume}
                             className="ml-auto"
                             onPointerUp={(e) => e.stopPropagation()}
                           />
@@ -202,26 +202,17 @@ const PlaySoundButton: React.FC<
   React.ComponentProps<typeof Button> & {
     soundUrl: string;
     previewLength?: number;
-    audioVolume?: number;
+    volumeControl?: TUseVolumeReturn;
   }
-> = ({
-  soundUrl,
-  audioVolume = 1,
-  previewLength = toSeconds(0.1),
-  ...props
-}) => {
+> = ({ soundUrl, volumeControl, previewLength = toSeconds(0.1), ...props }) => {
   const audioControl = useAudio(soundUrl, {
-    volume: audioVolume,
+    volumeControl,
     onStart() {
       setTimeout(() => {
         audioControl.stop();
       }, previewLength * 1000);
     },
   });
-
-  useEffect(() => {
-    audioControl.setVolume(audioVolume);
-  }, [audioVolume]);
 
   return (
     <Button

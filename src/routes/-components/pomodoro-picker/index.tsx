@@ -7,6 +7,9 @@ import { PomodoroSettings } from "../pomodoro-settings";
 import { useAudio } from "@/hooks/use-audio";
 import { usePomodoroSettings } from "../hooks/use-pomodoro-settings";
 import { alarmSounds, backgroundSounds } from "../sounds";
+import { Button } from "@/components/ui/button";
+import { Volume2, VolumeOff } from "lucide-react";
+import { ClientOnly } from "@tanstack/react-router";
 
 enum PomodoroMode {
   Pomodoro = "pomodoro",
@@ -19,13 +22,11 @@ export function PomodoroPicker() {
   const pomodoroSettings = usePomodoroSettings();
   const alarmAudioControl = useAudio(
     alarmSounds[pomodoroSettings.alarm].default,
-    { volume: pomodoroSettings.alarmVolume },
+    { volumeControl: pomodoroSettings.alarmVolume },
   );
   const backgroundAudioControl = useAudio(
     backgroundSounds[pomodoroSettings.background].default,
-    {
-      volume: pomodoroSettings.backgroundVolume,
-    },
+    { volumeControl: pomodoroSettings.backgroundVolume },
   );
   const hasFinished = useRef(false);
   const hasRestarted = useRef(false);
@@ -70,65 +71,107 @@ export function PomodoroPicker() {
   }
 
   return (
-    <Tabs
-      defaultValue={PomodoroMode.Pomodoro}
-      value={value}
-      onValueChange={(v) => {
-        onValueChange(v as PomodoroMode);
-        backgroundAudioControl.stop();
-      }}
-      className="sm:w-[450px] relative"
-    >
-      <Card className="px-5">
-        <div className="flex flex-col gap-2">
-          <PomodoroSettings {...pomodoroSettings} />
-          <TabsList className="mx-auto w-full sm:w-auto">
-            <TabsTrigger value={PomodoroMode.Pomodoro}>Pomodoro</TabsTrigger>
-            <TabsTrigger value={PomodoroMode.ShortBreak}>
-              Short Break
-            </TabsTrigger>
-            <TabsTrigger value={PomodoroMode.LongBreak}>Long Break</TabsTrigger>
-          </TabsList>
-          <CardTitle className="text-center mt-4 text-2xl">
-            {
-              {
-                [PomodoroMode.Pomodoro]: "Focus Time",
-                [PomodoroMode.ShortBreak]: "Short Break",
-                [PomodoroMode.LongBreak]: "Long Break",
-              }[value]
-            }
-          </CardTitle>
+    <>
+      <ClientOnly fallback={null}>
+        <div className="absolute right-5 top-5 flex gap-2">
+          <MuteButton {...pomodoroSettings.globalVolume}>All</MuteButton>
+          <MuteButton {...backgroundAudioControl.volumeControl}>
+            Background
+          </MuteButton>
+          <MuteButton {...alarmAudioControl.volumeControl}>Alarm</MuteButton>
         </div>
-        <CardContent>
-          <TabsContent value={PomodoroMode.Pomodoro}>
-            <Timer
-              initialTime={toSeconds(import.meta.env.DEV ? 1 : 25)}
-              onStart={onStart}
-              onStop={onStop}
-              onFinish={onFinish}
-              onReset={onReset}
-            />
-          </TabsContent>
-          <TabsContent value={PomodoroMode.ShortBreak}>
-            <Timer
-              initialTime={toSeconds(import.meta.env.DEV ? 0.5 : 5)}
-              onStart={onStart}
-              onStop={onStop}
-              onFinish={onFinish}
-              onReset={onReset}
-            />
-          </TabsContent>
-          <TabsContent value={PomodoroMode.LongBreak}>
-            <Timer
-              initialTime={toSeconds(import.meta.env.DEV ? 0.7 : 15)}
-              onStart={onStart}
-              onStop={onStop}
-              onFinish={onFinish}
-              onReset={onReset}
-            />
-          </TabsContent>
-        </CardContent>
-      </Card>
-    </Tabs>
+      </ClientOnly>
+
+      <Tabs
+        defaultValue={PomodoroMode.Pomodoro}
+        value={value}
+        onValueChange={(v) => {
+          onValueChange(v as PomodoroMode);
+          backgroundAudioControl.stop();
+        }}
+        className="sm:w-[450px] relative"
+      >
+        <Card className="px-5">
+          <div className="flex flex-col gap-2">
+            <PomodoroSettings {...pomodoroSettings} />
+            <TabsList className="mx-auto w-full sm:w-auto">
+              <TabsTrigger value={PomodoroMode.Pomodoro}>Pomodoro</TabsTrigger>
+              <TabsTrigger value={PomodoroMode.ShortBreak}>
+                Short Break
+              </TabsTrigger>
+              <TabsTrigger value={PomodoroMode.LongBreak}>
+                Long Break
+              </TabsTrigger>
+            </TabsList>
+            <CardTitle className="text-center mt-4 text-2xl">
+              {
+                {
+                  [PomodoroMode.Pomodoro]: "Focus Time",
+                  [PomodoroMode.ShortBreak]: "Short Break",
+                  [PomodoroMode.LongBreak]: "Long Break",
+                }[value]
+              }
+            </CardTitle>
+          </div>
+          <CardContent>
+            <TabsContent value={PomodoroMode.Pomodoro}>
+              <Timer
+                initialTime={toSeconds(import.meta.env.DEV ? 1 : 25)}
+                onStart={onStart}
+                onStop={onStop}
+                onFinish={onFinish}
+                onReset={onReset}
+              />
+            </TabsContent>
+            <TabsContent value={PomodoroMode.ShortBreak}>
+              <Timer
+                initialTime={toSeconds(import.meta.env.DEV ? 0.5 : 5)}
+                onStart={onStart}
+                onStop={onStop}
+                onFinish={onFinish}
+                onReset={onReset}
+              />
+            </TabsContent>
+            <TabsContent value={PomodoroMode.LongBreak}>
+              <Timer
+                initialTime={toSeconds(import.meta.env.DEV ? 0.7 : 15)}
+                onStart={onStart}
+                onStop={onStop}
+                onFinish={onFinish}
+                onReset={onReset}
+              />
+            </TabsContent>
+          </CardContent>
+        </Card>
+      </Tabs>
+    </>
+  );
+}
+
+function MuteButton({
+  isMuted,
+  unmute,
+  mute,
+  children,
+}: React.PropsWithChildren & {
+  mute: () => void;
+  unmute: () => void;
+  isMuted: boolean;
+}) {
+  return (
+    <Button
+      variant={isMuted ? "destructive" : "secondary"}
+      className={isMuted ? "" : "opacity-50 hover:opacity-100"}
+      onClick={() => {
+        if (isMuted) {
+          unmute();
+          return;
+        }
+        mute();
+      }}
+    >
+      {isMuted ? <VolumeOff /> : <Volume2 />}
+      {children}
+    </Button>
   );
 }

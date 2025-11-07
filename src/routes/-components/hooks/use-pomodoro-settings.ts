@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { alarmSounds, backgroundSounds } from "../sounds";
 import { LocalStorage } from "@/lib/local-storage";
 import { useAudioContext } from "@/providers/audio";
+import { useVolume } from "@/hooks/use-volume";
 
 const alarms = Object.keys(alarmSounds);
 const backgrounds = Object.keys(backgroundSounds);
@@ -24,15 +25,13 @@ export function usePomodoroSettings() {
   const [alarm, setAlarm] = useState(saved.alarm);
   const [background, setBackground] = useState(saved.background);
   const [repeat, setRepeat] = useState(saved.repeat);
-  const [globalVolume, setGlobalVolume] = useState(saved.globalVolume);
-  const [backgroundVolume, setBackgrondVolume] = useState(
-    saved.backgroundVolume,
-  );
-  const [alarmVolume, setAlarmVolume] = useState(saved.alarmVolume);
+  const globalVolume = useVolume(saved.globalVolume);
+  const backgroundVolume = useVolume(saved.backgroundVolume);
+  const alarmVolume = useVolume(saved.alarmVolume);
 
   function syncVolume() {
     cache.current.map.forEach((context) => {
-      context.cached.setGlobalGain(globalVolume);
+      context.cached.setGlobalGain(globalVolume.value);
     });
   }
 
@@ -43,15 +42,22 @@ export function usePomodoroSettings() {
       alarm,
       background,
       repeat,
-      globalVolume,
-      backgroundVolume,
-      alarmVolume,
+      globalVolume: globalVolume.value,
+      backgroundVolume: backgroundVolume.value,
+      alarmVolume: alarmVolume.value,
     });
-  }, [alarm, background, repeat, globalVolume, backgroundVolume, alarmVolume]);
+  }, [
+    alarm,
+    background,
+    repeat,
+    globalVolume.value,
+    backgroundVolume.value,
+    alarmVolume.value,
+  ]);
 
   useEffect(() => {
     syncVolume();
-  }, [globalVolume]);
+  }, [globalVolume.value]);
 
   return {
     alarm,
@@ -61,11 +67,8 @@ export function usePomodoroSettings() {
     repeat,
     setRepeat,
     globalVolume,
-    setGlobalVolume,
     backgroundVolume,
-    setBackgrondVolume,
     alarmVolume,
-    setAlarmVolume,
   };
 }
 
