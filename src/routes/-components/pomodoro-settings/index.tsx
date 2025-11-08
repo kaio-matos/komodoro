@@ -160,7 +160,7 @@ const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 
 					<div>
 						<h6 className="font-semibold mb-2">Presets</h6>
-						<div className="flex gap-2">
+						<div className="grid grid-cols-3 gap-2">
 							<Button
 								variant="outline"
 								onClick={() => props.setTimings(timings.default)}
