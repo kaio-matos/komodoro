@@ -1,7 +1,7 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toSeconds } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Timer } from "../timer";
 import { PomodoroSettings } from "../pomodoro-settings";
 import { useAudio } from "@/hooks/use-audio";
@@ -67,8 +67,14 @@ export function PomodoroPicker() {
 			play(repeat - 1);
 		};
 
+		new Notification("Timer ended");
+
 		play(pomodoroSettings.repeat);
 	}
+
+	useEffect(() => {
+		Notification.requestPermission();
+	}, []);
 
 	return (
 		<>
