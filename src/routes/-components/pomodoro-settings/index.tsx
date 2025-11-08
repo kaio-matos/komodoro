@@ -62,6 +62,28 @@ enum SettingsTabs {
 const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 	const [value, onValueChange] = useState<SettingsTabs>(SettingsTabs.Global);
 
+	const workBasis = 25;
+	const shortBreakBasis = 5;
+	const longBreakBasis = 15;
+
+	const timings = {
+		default: {
+			work: workBasis,
+			shortBreak: shortBreakBasis,
+			longBreak: longBreakBasis,
+		},
+		focus: {
+			work: workBasis * 1.2,
+			shortBreak: shortBreakBasis * 0.8,
+			longBreak: longBreakBasis * 0.8,
+		},
+		lazy: {
+			work: workBasis * 0.8,
+			shortBreak: shortBreakBasis * 1.2,
+			longBreak: longBreakBasis * 1.2,
+		},
+	};
+
 	return (
 		<div className="flex flex-col gap-4 mt-4">
 			<Tabs
@@ -93,9 +115,10 @@ const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 							Pomodoro
 							<Input
 								type="number"
+								step="1"
 								value={props.timings.work}
 								onChange={(e) => {
-									const n = Number(e.target.value);
+									const n = Math.round(Number(e.target.value));
 									if (n < Number(e.target.min)) return;
 									props.setTimings((v) => ({ ...v, work: n }));
 								}}
@@ -107,9 +130,10 @@ const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 							Short Break
 							<Input
 								type="number"
+								step="1"
 								value={props.timings.shortBreak}
 								onChange={(e) => {
-									const n = Number(e.target.value);
+									const n = Math.round(Number(e.target.value));
 									if (n < Number(e.target.min)) return;
 									props.setTimings((v) => ({ ...v, shortBreak: n }));
 								}}
@@ -121,9 +145,10 @@ const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 							Long Break
 							<Input
 								type="number"
+								step="1"
 								value={props.timings.longBreak}
 								onChange={(e) => {
-									const n = Number(e.target.value);
+									const n = Math.round(Number(e.target.value));
 									if (n < Number(e.target.min)) return;
 									props.setTimings((v) => ({ ...v, longBreak: n }));
 								}}
@@ -132,7 +157,32 @@ const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 							/>
 						</Label>
 					</div>
+
+					<div>
+						<h6 className="font-semibold mb-2">Presets</h6>
+						<div className="flex gap-2">
+							<Button
+								variant="outline"
+								onClick={() => props.setTimings(timings.default)}
+							>
+								Default
+							</Button>
+							<Button
+								variant="outline"
+								onClick={() => props.setTimings(timings.focus)}
+							>
+								Focus
+							</Button>
+							<Button
+								variant="outline"
+								onClick={() => props.setTimings(timings.lazy)}
+							>
+								Lazy
+							</Button>
+						</div>
+					</div>
 				</TabsContent>
+
 				<TabsContent
 					value={SettingsTabs.Background}
 					className="grid gap-4 mt-4"
