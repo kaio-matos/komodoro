@@ -91,7 +91,7 @@ const Content: React.FC<TUsePomodoroSettingsReturn> = (props) => {
 				value={value}
 				onValueChange={(v) => onValueChange(v as SettingsTabs)}
 			>
-				<TabsList>
+				<TabsList className="w-full">
 					<TabsTrigger value={SettingsTabs.Global}>Global</TabsTrigger>
 					<TabsTrigger value={SettingsTabs.Background}>Background</TabsTrigger>
 					<TabsTrigger value={SettingsTabs.Alarm}>Alarm</TabsTrigger>
