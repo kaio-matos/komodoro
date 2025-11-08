@@ -18,6 +18,11 @@ export function usePomodoroSettings() {
 				globalVolume: 1,
 				backgroundVolume: 0.1,
 				alarmVolume: 1,
+				timings: {
+					work: 25,
+					shortBreak: 5,
+					longBreak: 15,
+				},
 			}),
 		[],
 	);
@@ -25,6 +30,7 @@ export function usePomodoroSettings() {
 	const [alarm, setAlarm] = useState(saved.alarm);
 	const [background, setBackground] = useState(saved.background);
 	const [repeat, setRepeat] = useState(saved.repeat);
+	const [timings, setTimings] = useState(saved.timings);
 	const globalVolume = useVolume(saved.globalVolume);
 	const backgroundVolume = useVolume(saved.backgroundVolume);
 	const alarmVolume = useVolume(saved.alarmVolume);
@@ -45,6 +51,7 @@ export function usePomodoroSettings() {
 			globalVolume: globalVolume.value,
 			backgroundVolume: backgroundVolume.value,
 			alarmVolume: alarmVolume.value,
+			timings,
 		});
 	}, [
 		alarm,
@@ -53,6 +60,7 @@ export function usePomodoroSettings() {
 		globalVolume.value,
 		backgroundVolume.value,
 		alarmVolume.value,
+		timings,
 	]);
 
 	useEffect(() => {
@@ -69,6 +77,8 @@ export function usePomodoroSettings() {
 		globalVolume,
 		backgroundVolume,
 		alarmVolume,
+		timings,
+		setTimings,
 	};
 }
 

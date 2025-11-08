@@ -116,7 +116,7 @@ export function PomodoroPicker() {
 					<CardContent>
 						<TabsContent value={PomodoroMode.Pomodoro}>
 							<Timer
-								initialTime={toSeconds(import.meta.env.DEV ? 1 : 25)}
+								initialTime={toSeconds(pomodoroSettings.timings.work)}
 								onStart={onStart}
 								onStop={onStop}
 								onFinish={onFinish}
@@ -125,7 +125,7 @@ export function PomodoroPicker() {
 						</TabsContent>
 						<TabsContent value={PomodoroMode.ShortBreak}>
 							<Timer
-								initialTime={toSeconds(import.meta.env.DEV ? 0.5 : 5)}
+								initialTime={toSeconds(pomodoroSettings.timings.shortBreak)}
 								onStart={onStart}
 								onStop={onStop}
 								onFinish={onFinish}
@@ -134,7 +134,7 @@ export function PomodoroPicker() {
 						</TabsContent>
 						<TabsContent value={PomodoroMode.LongBreak}>
 							<Timer
-								initialTime={toSeconds(import.meta.env.DEV ? 0.7 : 15)}
+								initialTime={toSeconds(pomodoroSettings.timings.longBreak)}
 								onStart={onStart}
 								onStop={onStop}
 								onFinish={onFinish}
