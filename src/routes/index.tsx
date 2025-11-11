@@ -1,10 +1,17 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createFileRoute } from "@tanstack/react-router";
 import { PomodoroPicker } from "./-components/pomodoro-picker";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
+	useEffect(() => {
+		if ("serviceWorker" in navigator) {
+			navigator.serviceWorker.register('/sw.js')
+		}
+	},[])
+
 	return (
 		<ScrollArea className="h-screen w-screen">
 			<div className="h-screen flex flex-col">

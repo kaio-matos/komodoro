@@ -67,13 +67,19 @@ export function PomodoroPicker() {
 			play(repeat - 1);
 		};
 
-		new Notification("Timer ended");
+		if ("serviceWorker" in navigator) {
+			navigator.serviceWorker.ready.then((registration) => {
+				registration.showNotification('Timer ended');
+			});
+		}
 
 		play(pomodoroSettings.repeat);
 	}
 
 	useEffect(() => {
-		Notification.requestPermission();
+		if ("Notification" in window) {
+			Notification.requestPermission();
+		}
 	}, []);
 
 	return (
