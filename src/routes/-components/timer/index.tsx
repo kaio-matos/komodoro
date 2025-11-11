@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { formatTime, toSeconds } from "@/lib/utils";
+import { ClientOnly } from "@tanstack/react-router";
 import { Pause, Play, TimerResetIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import pressAudioURL from "@/assets/audio/extra/autoradio_button_press.wav?url";
+import { Button } from "@/components/ui/button";
 import { useAudio } from "@/hooks/use-audio";
 import { usePreciseInterval } from "@/hooks/use-precise-interval";
-import { ClientOnly } from "@tanstack/react-router";
+import { formatTime, toSeconds } from "@/lib/utils";
 
 export function Timer({
 	initialTime = toSeconds(25),
@@ -70,7 +70,15 @@ export function Timer({
 			<ClientOnly
 				fallback={<h3 className="text-5xl sm:text-8xl font-bold">--:--</h3>}
 			>
-				<h3 className="text-5xl sm:text-8xl font-bold">{formatTime(time)}</h3>
+				<h3
+					className="text-(length:--text-size) sm:text-(length:--md-text-size) font-bold"
+					style={{
+						["--md-text-size" as any]: `${(6 * 4) / formatTime(time).length}rem`,
+						["--text-size" as any]: `${(5 * 4) / formatTime(time).length}rem`,
+					}}
+				>
+					{formatTime(time)}
+				</h3>
 			</ClientOnly>
 			<div className="flex gap-2 mt-3">
 				<Button
